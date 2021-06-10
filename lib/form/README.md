@@ -8,7 +8,7 @@
 
 - `aile-ui/form` 没有预设表单组件，所有表单组件均通过 `render` 属性传递，通过灵活的 JSX 语法实现高度自定义组件，因此，它非常小巧，不过需要提前安装 `vue` 和 `element-ui` ；
 
-- `aile-ui/form` 底层采用 `$attrs` 和 `$listeners` 接收参数和监听事件，无缝对接 `element-ui` 中的 `Form` 文档板块，上手更快（所有 `<el-form>` 接受的参数 `<aile-form>` 都支持，所有 `<el-form-item>` 接受的参数，column都有相应的字段可以设置，所有的方法、事件和插槽，除了 [Form-Item Methods](https://element.eleme.cn/#/zh-CN/component/form#form-item-methods)，其他都支持）；
+- `aile-ui/form` 底层采用 `$attrs` 和 `$listeners` 接收参数和监听事件，无缝对接 `element-ui` 中的 `Form` 文档板块，上手更快（所有 `<el-form>` 接受的参数 `<aile-form>` 都支持，所有 `<el-form-item>` 接受的参数，column都有相应的字段可以设置，所有的方法、事件和插槽，除了 [Form-Item Methods](https://element-plus.org/#/zh-CN/component/form#form-item-methods)，其他都支持）；
 
 - 针对简单场景，可传递 `formatter` 属性进行格式化输出，在绑定了表单的情况下，可省略 `render` 和 `formatter` 属性，aile-form 会默认返回 `<span>` 标签包裹的表单值，当然，你还可以自定义当前的 `class` ！
 
@@ -60,7 +60,7 @@ yarn add aile-ui
 
 ### Form Attributes 表单属性
 
-仅展示必填项和新增项，其余参数见 [Element Doc Form #Form Attributes](https://element.eleme.cn/#/zh-CN/component/form)
+仅展示必填项和新增项，其余参数见 [Element Doc Form #Form Attributes](https://element-plus.org/#/zh-CN/component/form)
 
 |  参数  | 数据类型 | 是否必须 | 默认值 | 可选值 |               说明               |
 |:------:|:--------:|:--------:|:------:|:------:|:--------------------------------:|
@@ -69,15 +69,15 @@ yarn add aile-ui
 
 ### Form Methods 表单方法
 
-支持全部 `el-form` 方法，详见 [Element Doc Form #Form Methods](https://element.eleme.cn/#/zh-CN/component/form)
+支持全部 `el-form` 方法，详见 [Element Doc Form #Form Methods](https://element-plus.org/#/zh-CN/component/form)
 
 ### Form Events 表单事件
 
-支持全部 `el-form` 方法，详见 [Element Doc Form #Form Events](https://element.eleme.cn/#/zh-CN/component/form)
+支持全部 `el-form` 方法，详见 [Element Doc Form #Form Events](https://element-plus.org/#/zh-CN/component/form)
 
 ### Form-Item Attributes 表单列属性
 
-支持全部 `el-form-item` 属性，详见 [Element Doc Form #Form Events](https://element.eleme.cn/#/zh-CN/component/form)
+支持全部 `el-form-item` 属性，详见 [Element Doc Form #Form Events](https://element-plus.org/#/zh-CN/component/form)
 
 ### Form-Item Methods 表单列方法
 
@@ -85,7 +85,7 @@ yarn add aile-ui
 
 ### Column 列配置项
 
-仅展示必填项和新增项，其余参数见 [Element Doc Form #Form-column Attributes](https://element.eleme.cn/#/zh-CN/component/form)
+仅展示必填项和新增项，其余参数见 [Element Doc Form #Form-column Attributes](https://element-plus.org/#/zh-CN/component/form)
 
 |      参数      |                数据类型                | 是否必须 |                                       说明                                        |
 |:--------------:|:--------------------------------------:|:--------:|:---------------------------------------------------------------------------------:|
@@ -107,26 +107,26 @@ yarn add aile-ui
 
 ### Quick Start 快速开始
 
-注意：由于 `AileUI` 是基于 `ElementUI` 进行的二次开发，因此需全局引入ElementUI组件后方可正常使用
+注意：由于 `AilePlus` 是基于 `ElementPlus` 进行的二次开发，因此需全局引入ElementPlus组件后方可正常使用
 
 - 引用组件，根据需要可全局引入或者局部引入
 
 ```ts
 import Vue from 'vue'
-import ElementUI from 'element-ui'
+import ElementPlus from 'element-ui'
 import 'element-ui/libs/theme-chalk/index.css'
-Vue.use(ElementUI)
+Vue.use(ElementPlus)
 
 // 全量引入
-import AileUI from 'aile-ui'
-Vue.use(AileUI, {
+import AilePlus from 'aile-plus'
+Vue.use(AilePlus, {
     form: {
         emptyText: '--'
     }
 })
 
 // or 按需引入
-import AileForm from 'aile-ui/lib/form'
+import AileForm from 'aile-plus/lib/form'
 Vue.use(AileForm, {
     emptyText: '--'
 })

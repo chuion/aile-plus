@@ -61,7 +61,7 @@ yarn add aile-ui
 
 ### Attributes/Props 属性
 
-**支持 `ElementUI` 中 [Select](https://element.eleme.cn/#/zh-CN/component/select) 的所有属性：`value / v-model` / `multiple` / `disabled` / `clearable` / `collapse-tags` / `multiple-limit` / `filterable` 等**，此处仅展示额外属性：
+**支持 `ElementPlus` 中 [Select](https://element-plus.org/#/zh-CN/component/select) 的所有属性：`value / v-model` / `multiple` / `disabled` / `clearable` / `collapse-tags` / `multiple-limit` / `filterable` 等**，此处仅展示额外属性：
 
 |  参数  | 数据类型 | 默认值 |                说明                |
 | :----: | :------: | :----: | :--------------------------------: |
@@ -71,7 +71,7 @@ yarn add aile-ui
 
 ### Slot 插槽
 
-**支持 `ElementUI` 中 [Select](https://element.eleme.cn/#/zh-CN/component/select) 的所有插槽**，此处仅展示新增插槽：
+**支持 `ElementPlus` 中 [Select](https://element-plus.org/#/zh-CN/component/select) 的所有插槽**，此处仅展示新增插槽：
 
 |  name  |        说明         |
 | :----: | :-----------------: |
@@ -81,7 +81,7 @@ yarn add aile-ui
 
 ### Events 事件
 
-**支持 `ElementUI` 中 [Select](https://element.eleme.cn/#/zh-CN/component/select) 的所有事件**，此处仅展示新增事件：
+**支持 `ElementPlus` 中 [Select](https://element-plus.org/#/zh-CN/component/select) 的所有事件**，此处仅展示新增事件：
 
 | 事件名 |          说明          |            参数            |
 | :----: | :--------------------: | :------------------------: |
@@ -90,23 +90,23 @@ yarn add aile-ui
 
 ### Methods 方法
 
-**支持 `ElementUI` 中 [Select](https://element.eleme.cn/#/zh-CN/component/select) 的所有方法**
+**支持 `ElementPlus` 中 [Select](https://element-plus.org/#/zh-CN/component/select) 的所有方法**
 
 ### Quick Start 快速开始
 
-注意：由于 `AileUI` 是基于 `ElementUI` 进行的二次开发，因此需全局引入ElementUI组件后方可正常使用
+注意：由于 `AilePlus` 是基于 `ElementPlus` 进行的二次开发，因此需全局引入ElementPlus组件后方可正常使用
 
 - 引入模块并初始化配置
 
 ```ts
 import Vue from 'vue'
-import ElementUI from 'element-ui'
+import ElementPlus from 'element-ui'
 import 'element-ui/libs/theme-chalk/index.css'
-Vue.use(ElementUI)
+Vue.use(ElementPlus)
 
 // 全量引入
-import AileUI from 'aile-ui'
-Vue.use(AileUI, {
+import AilePlus from 'aile-plus'
+Vue.use(AilePlus, {
     select: {
         remote: false,
         filterable: false,
@@ -120,7 +120,7 @@ Vue.use(AileUI, {
 })
 
 // or 按需引入
-import AileSelect from 'aile-ui/lib/select'
+import AileSelect from 'aile-plus/lib/select'
 Vue.use(AileSelect, {
     remote: false,
     filterable: false,

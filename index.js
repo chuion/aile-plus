@@ -10,29 +10,27 @@ import Select from './lib/select';
 import Table from './lib/table';
 import Tooltip from './lib/tooltip';
 
-const AileUI = {
-  autocomplete: Autocomplete,
-  avatar: Avatar,
-  card: Card,
-  dialog: Dialog,
-  form: Form,
-  input: Input,
-  link: Link,
-  placement: Placement,
-  select: Select,
-  table: Table,
-  tooltip: Tooltip
+const AilePlus = {
+  Autocomplete,
+  Avatar,
+  Card,
+  Dialog,
+  Form,
+  Input,
+  Link,
+  Placement,
+  Select,
+  Table,
+  Tooltip
 };
 
 const install = (app, option = {}) => {
-  for (const name in AileUI) {
-    if ({}.hasOwnProperty.call(AileUI, name)) {
-      AileUI[name].install(app, option[name] || {});
-    }
-  }
+  Object.keys(AilePlus).forEach(name => {
+    AilePlus[name].install(app, option[name.toLowerCase()] || {});
+  })
 };
 
 export default {
-  ...AileUI,
+  ...AilePlus,
   install
 };

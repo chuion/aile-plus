@@ -48,6 +48,7 @@
 export default {
   name: "AileCard",
 
+  inheritAttrs: false,
   props: {
     // Card标题
     title: {

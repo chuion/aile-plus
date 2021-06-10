@@ -49,26 +49,26 @@ yarn add aile-ui
 
 ## Quick Start 快速开始
 
-注意：由于 `AileUI` 是基于 `ElementUI` 进行的二次开发，因此需全局引入 ElementUI 组件后方可正常使用
+注意：由于 `AilePlus` 是基于 `ElementPlus` 进行的二次开发，因此需全局引入 ElementPlus 组件后方可正常使用
 
 - 引入模块并初始化配置
 
 ```javascript
 import Vue from 'vue';
-import ElementUI from 'element-ui';
+import ElementPlus from 'element-ui';
 import 'element-ui/libs/theme-chalk/index.css';
-Vue.use(ElementUI);
+Vue.use(ElementPlus);
 
 // 全量引入
-import AileUI from 'aile-ui';
-Vue.use(AileUI, {
+import AilePlus from 'aile-plus';
+Vue.use(AilePlus, {
   placement: {
     emptySrc: require('@/assets/images/empty.svg'), // 空白占位图，使用require引入静态目录下的图片，或使用网络图片
   },
 });
 
 // or 按需引入
-import AilePlacement from 'aile-ui/lib/placement';
+import AilePlacement from 'aile-plus/lib/placement';
 Vue.use(AilePlacement, {
   emptySrc: require('@/assets/images/empty.svg'), // 空白占位图，使用require引入静态目录下的图片，或使用网络图片
 });

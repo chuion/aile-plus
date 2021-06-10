@@ -64,26 +64,26 @@ yarn add aile-ui
 
 ### Quick Start 快速开始
 
-注意：由于 `AileUI` 是基于 `ElementUI` 进行的二次开发，因此需全局引入 ElementUI 组件后方可正常使用
+注意：由于 `AilePlus` 是基于 `ElementPlus` 进行的二次开发，因此需全局引入 ElementPlus 组件后方可正常使用
 
 - 引入模块并初始化配置
 
 ```ts
 import Vue from 'vue';
-import ElementUI from 'element-ui';
+import ElementPlus from 'element-ui';
 import 'element-ui/libs/theme-chalk/index.css';
-Vue.use(ElementUI);
+Vue.use(ElementPlus);
 
 // 全量引入
-import AileUI from 'aile-ui';
-Vue.use(AileUI, {
+import AilePlus from 'aile-plus';
+Vue.use(AilePlus, {
   card: {
     shadow: 'always'
   },
 });
 
 // or 按需引入
-import AileCard from 'aile-ui/lib/avatar';
+import AileCard from 'aile-plus/lib/avatar';
 Vue.use(AileCard, {
     shadow: 'always'
   },

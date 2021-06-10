@@ -1,12 +1,9 @@
 <template>
   <el-tooltip
     ref="aileTooltip"
-    v-bind="$attrs"
+    v-bind="mergeProps"
     class="aile-tooltip"
-    :placement="calcPlacement"
-    :open-delay="calcShowAfter"
-    :effect="calcEffect"
-    :popper-class="'aile-tooltip__popper' + ' ' + popperClass"
+    :popper-class="calcPopperClass"
   >
     <template #content>
       <slot name="content" />
@@ -16,58 +13,50 @@
 </template>
 
 <script>
+import { checkType } from '../../../utils/index.js';
 
-const DefaultConfig = {}
+const DefaultProps = {
+  placement: 'bottom',
+  showAfter: 0
+}
 
 export default {
   name: 'AileTooltip',
 
   inheritAttrs: false,
   props: {
-    config: {
-      // maxWidth 最大宽度
-      type: Object,
-      default: () => ({})
-    },
-    placement: {
-      type: String,
-      default: undefined
-    },
-    showAfter: {
-      type: Number,
-      default: 0
-    },
-    effect: {
-      type: String,
-      default: undefined
-    },
     popperClass: {
-      type: String,
+      type: [String, Array, Object],
       default: ''
     }
   },
   computed: {
-    mergeConfig() {
+    mergeProps() {
       return {
-        ...DefaultConfig,
-        ...this.$aileTooltip.config,
-        ...this.config
-      };
-    },
-    calcPlacement() {
-      if (this.placement === undefined) {
-        return this.$aileTooltip.placement;
+        ...DefaultProps, // 默认属性
+        ...this.$aileTooltip.attrs, // 全局属性
+        ...this.$attrs // 组件属性
       }
-      return this.placement;
     },
-    calcShowAfter() {
-      return this.showAfter || this.$aileTooltip.showAfter;
-    },
-    calcEffect() {
-      if (this.effect === undefined) {
-        return this.$aileTooltip.effect;
+    calcPopperClass() {
+      const classList = ['aile-tooltip__popper']
+      switch (checkType(this.popperClass)) {
+        case 'string':
+          classList.push(this.popperClass)
+          break;
+        case 'array':
+          classList.push(...this.popperClass)
+          break;
+        case 'object':
+          Object.keys(this.popperClass).forEach(key => {
+            if (!!this.popperClass[key]) {
+              classList.push(key)
+            }
+          })
+          break;
+        default:
       }
-      return this.effect;
+      return classList.filter(item => !!item).join(' ')
     }
   }
 };

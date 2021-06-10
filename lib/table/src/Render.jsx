@@ -1,7 +1,7 @@
 const CustomRender = (props) => {
   return (
     props.render(props.scope) || (
-      <span className="aile-table-item__placeholder">Empty</span>
+      <span className="aile-table-item__placeholder">{props.cellEmptyText}</span>
     )
   );
 };

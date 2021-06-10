@@ -1,7 +1,7 @@
 {
   "name": "aile-ui",
   "version": "1.1.0",
-  "description": "Advance Vue 2.x Components based on ElementUI",
+  "description": "Advance Vue 2.x Components based on ElementPlus",
   "main": "index.js",
   "scripts": {
     "lint": "eslint --ext .js,.vue ./ --fix"

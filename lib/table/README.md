@@ -27,8 +27,8 @@ yarn add aile-ui
 | :--------------------: | :------: | :----: | :---------------: | :-----------------------------------: |
 |        colAlign        |  String  | center | left/right/center |         设置表格列的对齐方式          |
 |     colHeaderAlign     |  String  | center | left/right/center |          设置表头的对其方式           |
-|      colEmptyText      |  String  |  '-'   |         -         |   表格单元数据为空时显示的文本内容    |
-|      pagerOffset       |  Number  |   0    |         -         |  设置分页器与表格的间距，单位是'px'   |
+|      placeholder      |  String  |  '-'   |         -         |   表格单元数据为空时显示的文本内容    |
+|      paginationMarginTop       |  Number  |   0    |         -         |  设置分页器与表格的间距，单位是'px'   |
 |    customClassName     |  String  |   ''   |         -         |           自定义 class 名称           |
 |      tablePadding      |  Number  |   0    |         -         | Table 的 Padding 值，计算表格高度会用 |
 | colShowOverflowTooltip | Boolean  | false  |    true/false     |    当内容过长被隐藏时显示 tooltip     |
@@ -36,17 +36,17 @@ yarn add aile-ui
 
 ### Table Attributes 表格属性
 
-仅展示必填项和新增项，其余参数见 [Element Doc Table #Table-column Attributes](https://element.eleme.cn/#/zh-CN/component/table) 及 [Element Doc Pagination](https://element.eleme.cn/#/zh-CN/component/pagination)
+仅展示必填项和新增项，其余参数见 [Element Doc Table #Table-column Attributes](https://element-plus.org/#/zh-CN/component/table) 及 [Element Doc Pagination](https://element-plus.org/#/zh-CN/component/pagination)
 
 |          参数          | 数据类型 | 是否必须 | 默认值 |      可选值       |                 说明                  |
 | :--------------------: | :------: | :------: | :----: | :---------------: | :-----------------------------------: |
 |          data          |  Array   |    是    |   -    |         -         |               表格数据                |
 |         column         |  Array   |    是    |   -    |         -         |   表格列配置项，具体内容见下方说明    |
 |       pagination       | Boolean  |    否    | false  |         -         |            是否显示分页器             |
-|      pagerOffset       |  Number  |    否    |   0    |         -         |  设置分页器与表格的间距，单位是'px'   |
+|      paginationMarginTop       |  Number  |    否    |   0    |         -         |  设置分页器与表格的间距，单位是'px'   |
 |        colAlign        |  String  |    否    | center | left/right/center |         设置表格列的对齐方式          |
 |     colHeaderAlign     |  String  |    否    | center | left/right/center |          设置表头的对其方式           |
-|      colEmptyText      |  String  |    否    |  '-'   |         -         |   表格单元数据为空时显示的文本内容    |
+|      placeholder      |  String  |    否    |  '-'   |         -         |   表格单元数据为空时显示的文本内容    |
 |    customClassName     |  String  |    否    |   -    |         -         |           自定义 class 名称           |
 |      tablePadding      |  Number  |    否    |   0    |         -         | Table 的 Padding 值，计算表格高度会用 |
 | colShowOverflowTooltip | Boolean  |    否    | false  |    true/false     |    当内容过长被隐藏时显示 tooltip     |
@@ -54,7 +54,7 @@ yarn add aile-ui
 
 ### Table Events 表格事件
 
-仅展示新增事件，其余事件见 [Element Doc Table #Table Events](https://element.eleme.cn/#/zh-CN/component/table) 及 [Element Doc Pagination](https://element.eleme.cn/#/zh-CN/component/pagination)
+仅展示新增事件，其余事件见 [Element Doc Table #Table Events](https://element-plus.org/#/zh-CN/component/table) 及 [Element Doc Pagination](https://element-plus.org/#/zh-CN/component/pagination)
 
 |        事件名        |                说明                |           参数            |
 | :------------------: | :--------------------------------: | :-----------------------: |
@@ -63,7 +63,7 @@ yarn add aile-ui
 
 ### Table Methods 表格方法
 
-支持全部 `el-table` 和 `el-pagination` 方法，详见 [Element Doc Table #Table Methods](https://element.eleme.cn/#/zh-CN/component/table) 及 [Element Doc Pagination](https://element.eleme.cn/#/zh-CN/component/pagination)
+支持全部 `el-table` 和 `el-pagination` 方法，详见 [Element Doc Table #Table Methods](https://element-plus.org/#/zh-CN/component/table) 及 [Element Doc Pagination](https://element-plus.org/#/zh-CN/component/pagination)
 
 ### Table Slot 表格插槽
 
@@ -75,41 +75,40 @@ yarn add aile-ui
 
 ### Column 列配置项
 
-仅展示必填项和新增项，其余参数见 [Element Doc Table #Table-column Attributes](https://element.eleme.cn/#/zh-CN/component/table)
+仅展示必填项和新增项，其余参数见 [Element Doc Table #Table-column Attributes](https://element-plus.org/#/zh-CN/component/table)
 
-|   参数    |          数据类型           | 是否必须 |              说明              |
-| :-------: | :-------------------------: | :------: | :----------------------------: |
-|   prop    |           String            |    是    |      设置表格列的对齐方式      |
-|   label   |           String            |    是    |       设置表头的对其方式       |
-|  render   | Function(h, context)/VNode  |    否    | 自定义渲染内容,可选返回 VNode  |
-| formatter | Function(h, context)/string |    否    | 自定义渲染内容，可选返回字符串 |
-|   show    |     Function()/boolean      |    否    |     是否渲染该列，默认渲染     |
+|     参数     |         数据类型         | 是否必须 |               说明                |
+| :----------: | :----------------------: | :------: | :-------------------------------: |
+|    render    | Function(context)/VNode  |    否    |   自定义渲染内容,可选返回 VNode   |
+| renderHeader | Function(context)/VNode  |    否    | 自定义表头渲染内容,可选返回 VNode |
+|  formatter   | Function(context)/string |    否    |  自定义渲染内容，可选返回字符串   |
+|     show     |    Function()/boolean    |    否    |      是否渲染该列，默认渲染       |
 
 ### Quick Start 快速开始
 
-注意：由于 `AileUI` 是基于 `ElementUI` 进行的二次开发，因此需全局引入 ElementUI 组件后方可正常使用
+注意：由于 `AilePlus` 是基于 `ElementPlus` 进行的二次开发，因此需全局引入 ElementPlus 组件后方可正常使用
 
 引入模块并初始化配置
 
 ```ts
 import Vue from 'vue';
-import ElementUI from 'element-ui';
+import ElementPlus from 'element-ui';
 import 'element-ui/libs/theme-chalk/index.css';
-Vue.use(ElementUI);
+Vue.use(ElementPlus);
 
 // 全量引入
-import AileUI from 'aile-ui';
-Vue.use(AileUI, {
+import AilePlus from 'aile-plus';
+Vue.use(AilePlus, {
   table: {
-    colEmptyText: 'No Data',
+    placeholder: 'No Data',
     customClassName: 'tt-table',
   },
 });
 
 // or 按需引入
-import AileTable from 'aile-ui/lib/table';
+import AileTable from 'aile-plus/lib/table';
 Vue.use(AileTable, {
-  colEmptyText: 'No Data',
+  placeholder: 'No Data',
   customClassName: 'tt-table',
 });
 ```
