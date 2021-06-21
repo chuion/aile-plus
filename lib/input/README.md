@@ -1,9 +1,9 @@
-## aile-ui/input
+## aile-plus/input
 
 ### Intro 简介
 
-`aile-ui/input` 是一款 Input 组件，基于 `vue` 和 `element-ui` 进行的二次封装，可以根据需要配置宽度，是否默认开启清空（clearable）、清除前后空格（trim）
-- `aile-ui/input` 采用 `$attrs` 和 `$listeners` 接收参数和监听事件，无缝对接 `element-ui` 中的 `Input` 文档板块
+`aile-plus/input` 是一款 Input 组件，基于 `Vue3` 和 `ElementPlus` 进行的二次封装，可以根据需要配置宽度，是否默认开启清空（clearable）、input内容改变后清除前后空格（lazyTrim）
+- `aile-plus/input` 完美适配 `element-plus` 中的 `Input` 文档板块
 - 支持安装时个性化配置
 
 ### Install 安装
@@ -11,10 +11,10 @@
 通过 `npm` 或者 `yarn` 安装项目
 
 ```bash
-npm i aile-ui
+npm i aile-plus
 
 # 或者
-yarn add aile-ui
+yarn add aile-plus
 ```
 ### Options 配置项
 
@@ -24,17 +24,17 @@ yarn add aile-ui
 
 下表所列属性可在 `main.js` 中安装组件时进行统一配置：
 
-|    参数    | 数据类型 | 默认值 |   可选值   |          说明           |
-| :--------: | :------: | :----: | :--------: | :---------------------: |
-| clearable  | Boolean  | false  | true/false |       是否可清空        |
-| **config** |  Object  |   {}   |     —      | 特殊配置，如 trim/width |
+|    参数    | 数据类型 | 默认值 | 可选值 |     说明      |
+| :--------: | :------: | :----: | :----: | :-----------: |
+| **config** |  Object  |   {}   |   —    |   特殊配置    |
+| **attrs**  |  Object  |   {}   |   —    | ElInput Props |
 
 #### config 配置项
 
-|       参数       | 数据类型 | 默认值 |   可选值   |                  说明                   |
-| :--------------: | :------: | :----: | :--------: | :-------------------------------------: |
-|      width       |  string  |   -    |     -      |          输入框宽度（如 100%）          |
-| trimBeforeChange | boolean  | false  | true/false | 是否在Input触发change事件前进行trim处理 |
+|   参数   | 数据类型 | 默认值 |   可选值   |                  说明                   |
+| :------: | :------: | :----: | :--------: | :-------------------------------------: |
+|  width   |  string  |   -    |     -      |          输入框宽度（如 100%）          |
+| lazyTrim | boolean  | false  | true/false | 是否在Input触发change事件前进行trim处理 |
 
 ### AileInput Attributes 属性
 
@@ -59,31 +59,38 @@ yarn add aile-ui
 - 引入模块并初始化配置
 
 ```ts
-import Vue from 'vue'
-import ElementPlus from 'element-ui'
-import 'element-ui/libs/theme-chalk/index.css'
-Vue.use(ElementPlus)
+import { createApp } from 'vue'
+import App from './App.vue'
+import ElementPlus from 'element-plus'
+import 'element-plus/lib/theme-chalk/index.css';
+
+const app = createApp(App)
+app.use(ElementPlus)
 
 // 全量引入
 import AilePlus from 'aile-plus'
-Vue.use(AilePlus, {
-    input: {
-        clearable: true,
-        config: {
-          trim: true,
-          width: '100%'
-        }
+app.use(AilePlus, {
+  input: {
+    attrs: {
+      clearable: true,
+    },
+    config: {
+      lazyTrim: true,
+      width: '100%'
     }
+  }
 })
 
 // or 按需引入
 import AileInput from 'aile-plus/lib/input'
-Vue.use(AileInput, {
+app.use(AileInput, {
+  attrs: {
     clearable: true,
-    config: {
-      trim: true,
-      width: '100%'
-    }
+  },
+  config: {
+    lazyTrim: true,
+    width: '100%'
+  }
 })
 
 ```
@@ -99,7 +106,7 @@ Vue.use(AileInput, {
   clearable
   :config="{
     width: '100%',
-    trim: true
+    lazyTrim: true
   }"
 />
 
@@ -111,7 +118,7 @@ Vue.use(AileInput, {
   clearable
   config={{
     width: '100%',
-    trim: true
+    lazyTrim: true
   }}
 />
 ```

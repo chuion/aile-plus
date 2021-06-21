@@ -1,7 +1,7 @@
 <template>
   <el-tooltip
     ref="aileTooltip"
-    v-bind="mergeProps"
+    v-bind="mergeAttrs"
     class="aile-tooltip"
     :popper-class="calcPopperClass"
   >
@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { checkType } from '../../../utils/index.js';
+import { checkType, mergeClass } from '../../../utils/index.js'
 
 const DefaultProps = {
   placement: 'bottom',
@@ -31,33 +31,16 @@ export default {
     }
   },
   computed: {
-    mergeProps() {
+    mergeAttrs () {
       return {
         ...DefaultProps, // 默认属性
         ...this.$aileTooltip.attrs, // 全局属性
         ...this.$attrs // 组件属性
       }
     },
-    calcPopperClass() {
-      const classList = ['aile-tooltip__popper']
-      switch (checkType(this.popperClass)) {
-        case 'string':
-          classList.push(this.popperClass)
-          break;
-        case 'array':
-          classList.push(...this.popperClass)
-          break;
-        case 'object':
-          Object.keys(this.popperClass).forEach(key => {
-            if (!!this.popperClass[key]) {
-              classList.push(key)
-            }
-          })
-          break;
-        default:
-      }
-      return classList.filter(item => !!item).join(' ')
+    calcPopperClass () {
+      return mergeClass(['aile-tooltip__popper', this.popperClass])
     }
   }
-};
+}
 </script>

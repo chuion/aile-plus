@@ -1,15 +1,14 @@
 <template>
   <el-select
     ref="select"
-    class="aile-select"
     v-scroll="handleLoadMore"
-    v-bind="$attrs"
-    :filterable="calcFilterable"
-    :remote="calcRemote"
-    :default-first-option="calcDefaultFirstOption"
-    :loading="loading && currentPage === 1"
-    :remote-method="mergeConfig.method ? getRemoteList : remoteMethod"
-    :popper-append-to-body="calcPopperAppendToBody"
+    class="aile-select"
+    v-bind="mergeSelectAttrs"
+
+    :remote="isRemote"
+    :remote-method="mergeConfig.remoteMethod ? getRemoteList : remoteMethod"
+    :loading="showRemoteLoading"
+
     @change="handleChange"
   >
     <template #prefix>
@@ -17,10 +16,11 @@
     </template>
 
     <slot>
-      <el-tooltip
+      <component
+        :is="mergeConfig.tooltipComponent"
         v-for="item in options"
         :key="JSON.stringify(item)"
-        v-bind="mergeConfig.tooltip"
+        v-bind="mergeTooltipAttrs"
         :content="calcLabel(item)"
         :disabled="tooltipDisable(item)"
       >
@@ -29,7 +29,7 @@
           :label="calcLabel(item)"
           :disabled="calcDisabled(item)"
         />
-      </el-tooltip>
+      </component>
     </slot>
 
     <template #empty>
@@ -39,83 +39,19 @@
 </template>
 
 <script>
-import isEqual from "./isEqual";
-
-// AileSelect的默认参数，可通过传入props.config进行覆盖
-const DefaultConfig = {
-  // queryKey的值为空时，是否允许继续发送请求
-  // 参数可选类型: Boolean
-  notNull: false,
-
-  // 设置el-option的label和value的格式化
-  // 参数可选类型: [String, Function]
-  itemLabel: undefined,
-  itemValue: undefined,
-
-  // 设置禁用条件默认为disabled
-  // 参数可选类型: [Boolean, Function]
-  itemDisable: false,
-
-  // dataSource 初始下拉列表
-  // 参数可选类型: Array
-  dataSource: [],
-
-  // 组件会Watch该属性，当属性值为true时，清空当前的Options
-  // 参数可选类型: Boolean
-  clearSignal: false,
-
-  // 是否开启无限滚动
-  // 参数可选类型: Boolean
-  scrollable: true,
-
-  // 组件是否显示Tooltip
-  // 参数可选类型: [Boolean, Function]
-  itemShowTooltip: false,
-
-  // tooltip参数，支持<el-tooltip>的全部属性设置
-  // 参数可选类型: Obejct
-  tooltip: { "open-delay": 1000, placement: "top" },
-
-  // method 为远程请求API
-  // 参数可选类型: Function
-  method: undefined,
-
-  // 远程搜索的参数名称
-  // 参数可选类型: String
-  queryKey: "",
-
-  // 远程搜索的其他参数，会和queryKey合并
-  // 参数可选类型: Object
-  requestParams: {},
-
-  // 是否只执行一次初始化请求（用于仅将API传入并获取下拉列表，但不需要远程搜索）
-  onceRequest: false,
-
-  // pageField,sizeField 为分页字段名称
-  pageField: "page_index",
-  sizeField: "page_size",
-
-  // 页容量
-  pageSize: 20,
-
-  // respDataField/respTotalField 请求结果的data/total字段名称
-  respDataField: "data",
-  respTotalField: "total",
-
-  // 请求成功后事件回调
-  // 参数可选类型: Function
-  respFormatter: (list) => list,
-};
+import isEqual from './isEqual'
+import { DefaultConfig, DefaultSelectAttrs, DefaultTooltipAttrs } from './config.js'
 
 export default {
-  name: "AileSelect",
+  name: 'AileSelect',
+
   directives: {
     scroll: {
-      mounted(el, binding) {
-        const child = el.querySelector('.select-trigger');
-        const id = child.getAttribute('ariadescribedby');
-        const poper = document.getElementById(id);
-        const SELECTDOWN_DOM = poper.querySelector('.el-scrollbar .el-select-dropdown__wrap');
+      mounted (el, binding) {
+        const child = el.querySelector('.select-trigger')
+        const id = child.getAttribute('ariadescribedby')
+        const poper = document.getElementById(id)
+        const SELECTDOWN_DOM = poper.querySelector('.el-scrollbar .el-select-dropdown__wrap')
 
         // 这里不能使用箭头函数！
         SELECTDOWN_DOM.addEventListener('scroll', function () {
@@ -127,233 +63,218 @@ export default {
            * 如果元素滚动到底, 下面等式返回true, 没有则返回false:
            * ele.scrollHeight - ele.scrollTop === ele.clientHeight;
            */
-          const CONDITION = this.scrollHeight - this.scrollTop <= this.clientHeight;
+          const CONDITION = this.scrollHeight - this.scrollTop <= this.clientHeight
           if (CONDITION) {
-            binding.value();
+            binding.value()
           }
-        });
+        })
       }
-    },
+    }
   },
 
   inheritAttrs: false,
   props: {
     config: {
       type: Object,
-      default: () => ({}),
+      default: () => ({})
     },
-    remote: {
-      type: Boolean,
-      default: undefined,
-    },
-    filterable: {
-      type: Boolean,
-      default: undefined,
-    },
+
     remoteMethod: {
       type: Function,
-      default: () => {},
-    },
-    popperAppendToBody: {
-      type: Boolean,
-      default: undefined,
-    },
-    defaultFirstOption: {
-      type: Boolean,
-      default: undefined,
-    },
+      default: () => {}
+    }
   },
-  data() {
+  data () {
     return {
       options: [],
-      loading: false,
+      remoteLoading: false,
       currentPage: 1,
       total: 0,
-      payload: "",
-      selectedOptions: [],
-    };
+      payload: '',
+      selectedOptions: []
+    }
   },
   computed: {
-    mergeConfig() {
+    // 配置项
+    mergeConfig () {
       return {
         ...DefaultConfig,
         ...this.$aileSelect.config,
-        ...this.config,
-      };
+        ...this.config
+      }
+    },
+
+    // el-select 属性
+    mergeSelectAttrs () {
+      const res = {
+        ...DefaultSelectAttrs, // 默认属性
+        ...this.$aileSelect.attrs, // 全局属性
+        ...this.$attrs
+      }
+      delete res.tooltip
+      return res
+    },
+
+    // el-tooltip 属性
+    mergeTooltipAttrs () {
+      return {
+        ...DefaultTooltipAttrs,
+        ...this.$aileSelect.tooltip,
+        ...this.$attrs.tooltip
+      }
     },
 
     /**
-     * 是否远程搜索
+     * 是否采用远程搜索
      */
-    calcRemote() {
-      if (this.mergeConfig.onceRequest) return false;
-      if (this.mergeConfig.method) return true;
-      if (this.remote === undefined) {
-        return this.$aileSelect.remote;
-      }
-      return this.remote;
-    },
-
-    /**
-     * 可搜索
-     */
-    calcFilterable() {
-      if (this.mergeConfig.method) return true;
-      if (this.filterable === undefined) {
-        return this.$aileSelect.filterable;
-      }
-      return this.filterable;
-    },
-
-    /**
-     * 将下拉框添加至body
-     */
-    calcPopperAppendToBody() {
-      if (this.popperAppendToBody === undefined) {
-        return this.$aileSelect.popperAppendToBody;
-      }
-      return this.popperAppendToBody;
-    },
-
-    /**
-     * 默认选择第一个下拉项
-     */
-    calcDefaultFirstOption() {
-      if (this.defaultFirstOption === undefined) {
-        return this.$aileSelect.popperAppendToBody;
-      }
-      return this.defaultFirstOption;
+    isRemote () {
+      if (this.mergeConfig.onceRequest) return false
+      if (this.mergeConfig.remoteMethod) return true
+      return this.mergeSelectAttrs.remote
     },
 
     /**
      * 是否可以继续滚动加载
      */
-    canLoadMore() {
+    canLoadMore () {
       return (
         this.mergeConfig.scrollable &&
-        this.mergeConfig.method &&
+        this.mergeConfig.remoteMethod &&
         this.currentPage * this.mergeConfig.pageSize < this.total
-      );
+      )
     },
+
+    /**
+     * 是否显示Loading效果
+     */
+    showRemoteLoading () {
+      if (this.mergeSelectAttrs.loading) {
+        return true
+      }
+      if (this.mergeConfig.showEachLoading) {
+        return this.remoteLoading
+      }
+      return this.currentPage === 1 && this.remoteLoading
+    }
   },
   watch: {
-    "mergeConfig.clearSignal"(val) {
+    'mergeConfig.isClear' (val) {
       if (val) {
-        this._reset();
+        this._reset()
       }
     },
-    "mergeConfig.dataSource"(newVal, oldVal) {
+    'mergeConfig.data' (newVal, oldVal) {
       if (!isEqual(newVal, oldVal)) {
-        this._updateOptionList(newVal, newVal.length);
+        this._updateOptionList(newVal, newVal.length)
       }
     },
-    "mergeConfig.requestParams"(newVal, oldVal) {
+    'mergeConfig.requestParams' (newVal, oldVal) {
       if (!isEqual(newVal, oldVal)) {
-        this.getRemoteList();
+        this.getRemoteList()
       }
-    },
+    }
   },
-  mounted() {
-    this.init();
+  mounted () {
+    this.init()
     this.$refs.select.$refs.popper.$el.addEventListener(
-      "mousewheel",
+      'mousewheel',
       this.cleanTooltip
-    );
+    )
   },
-  beforeUnmount() {
+  beforeUnmount () {
     this.$refs.select.$refs.popper.$el.removeEventListener(
-      "mousewheel",
+      'mousewheel',
       this.cleanTooltip
-    );
+    )
   },
   methods: {
     /**
      * 初始化组件
      */
-    async init() {
-      const config = this.mergeConfig;
+    async init () {
+      const config = this.mergeConfig
 
       // 如果存在传入的列表，则使用传入的列表作为下拉列表
-      if (config.dataSource.length) {
-        const list = config.dataSource;
-        this._updateOptionList(list, list.length);
-        this.selectedOptions = config.dataSource;
-      } else if (config.method) {
+      if (config.data.length) {
+        const list = config.data
+        this._updateOptionList(list, list.length)
+        this.selectedOptions = config.data
+      } else if (config.remoteMethod) {
         // 执行自定义远程搜索方法
-        await this.getRemoteList();
+        await this.getRemoteList()
       } else {
         // 执行原始远程执行方法，默认为空函数执行
-        await this.remoteMethod();
+        await this.remoteMethod()
       }
       if (this.$attrs.onInited) {
-        this.$emit("inited", this.options);
+        this.$emit('inited', this.options)
       }
     },
 
     /**
      * 计算可选项绑定的value
      */
-    calcValue(item) {
-      if (this.mergeConfig.itemValue) {
-        if (typeof this.mergeConfig.itemValue === "function") {
-          return this.mergeConfig.itemValue(item);
+    calcValue (item) {
+      if (this.mergeConfig.value) {
+        if (typeof this.mergeConfig.value === 'function') {
+          return this.mergeConfig.value(item)
         } else {
-          return item[this.mergeConfig.itemValue];
+          return item[this.mergeConfig.value]
         }
       }
-      return item;
+      return item
     },
 
     /**
      * 计算可选项显示的label
      */
-    calcLabel(item) {
-      if (this.mergeConfig.itemLabel) {
-        if (typeof this.mergeConfig.itemLabel === "function") {
-          return this.mergeConfig.itemLabel(item);
+    calcLabel (item) {
+      if (this.mergeConfig.label) {
+        if (typeof this.mergeConfig.label === 'function') {
+          return this.mergeConfig.label(item)
         } else {
-          return item[this.mergeConfig.itemLabel];
+          return item[this.mergeConfig.label]
         }
       }
-      return item;
+      return item
     },
 
     /**
      * 计算可选项是否需要禁用
      */
-    calcDisabled(item) {
-      if (this.mergeConfig.itemDisable) {
-        if (typeof this.mergeConfig.itemDisable === "function") {
-          return this.mergeConfig.itemDisable(item);
+    calcDisabled (item) {
+      if (this.mergeConfig.disabled) {
+        if (typeof this.mergeConfig.disabled === 'function') {
+          return this.mergeConfig.disabled(item)
         } else {
-          return item[this.mergeConfig.itemDisable];
+          return item[this.mergeConfig.disabled]
         }
       }
-      return item.disabled;
+      return item.disabled
     },
 
     /**
      * 计算可选项是否需要禁用tooltip
      */
-    tooltipDisable(item) {
-      if (typeof this.mergeConfig.itemShowTooltip === "boolean") {
-        return !this.mergeConfig.itemShowTooltip;
-      } else if (typeof this.mergeConfig.itemShowTooltip === "function") {
-        return !this.mergeConfig.itemShowTooltip(item);
+    tooltipDisable (item) {
+      if (typeof this.mergeConfig.showTooltip === 'boolean') {
+        return !this.mergeConfig.showTooltip
+      } else if (typeof this.mergeConfig.showTooltip === 'function') {
+        return !this.mergeConfig.showTooltip(item)
       }
     },
 
     /**
      * 根据配置中的 scrollable 决定采用何种请求方式
      */
-    async getRemoteList(payload = "") {
-      this.payload = payload;
-      this.currentPage = 1;
-      this.total = 0;
+    async getRemoteList (payload = '') {
+      this.payload = payload
+      this.currentPage = 1
+      this.total = 0
       if (this.mergeConfig.scrollable) {
-        await this.fetchOptionListByScroll();
+        await this.fetchOptionListByScroll()
       } else {
-        await this.fetchOptionListOnce();
+        await this.fetchOptionListOnce()
       }
     },
 
@@ -362,116 +283,115 @@ export default {
      * @param {array} list 列表数组
      * @param {number} total 列表总数
      */
-    _updateOptionList(list, total) {
-      const res = this.mergeConfig.respFormatter(list);
+    _updateOptionList (list, total) {
+      const res = this.mergeConfig.respFormatter(list)
 
       if (total) {
-        this.total = total;
+        this.total = total
       }
       if (!this.currentPage || this.currentPage === 1) {
-        this.options = res;
+        this.options = res
       } else {
-        this.options.push(...res);
+        this.options.push(...res)
       }
     },
 
     /**
      * 重置下拉列表
      */
-    _reset() {
-      this.options = [];
-      this.currentPage = 1;
-      this.total = 0;
-      this.payload = "";
+    _reset () {
+      this.options = []
+      this.currentPage = 1
+      this.total = 0
+      this.payload = ''
     },
 
     /**
      * 无需分页的请求方式
      */
-    async fetchOptionListOnce() {
-      const config = this.mergeConfig;
+    async fetchOptionListOnce () {
+      const config = this.mergeConfig
 
       // 判断是否存在非空条件
-      if (config.notNull && !this.payload) return;
+      if (config.nonEmpty && !this.payload) return
 
       // 构造请求参数
-      const query = { ...config.requestParams };
-      if (config.queryKey && this.payload) {
-        query[config.queryKey] = this.payload;
+      const query = { ...config.requestParams }
+      if (config.queryField && this.payload) {
+        query[config.queryField] = this.payload
       }
 
       try {
-        this.loading = true;
-        const resp = await config.method(query);
+        this.remoteLoading = true
+        const resp = await config.remoteMethod(query)
         this._updateOptionList(
           resp[config.respDataField],
           resp[config.respTotalField]
-        );
+        )
       } catch (error) {
-        this._reset();
+        this._reset()
       } finally {
-        this.loading = false;
+        this.remoteLoading = false
       }
     },
 
     /**
      * 需要分页的请求方式
      */
-    async fetchOptionListByScroll() {
-      const config = this.mergeConfig;
+    async fetchOptionListByScroll () {
+      const config = this.mergeConfig
 
       // 判断是否存在非空条件
-      if (config.notNull && !this.payload) return;
+      if (config.nonEmpty && !this.payload) return
 
       // 构造请求参数
       const query = {
         [config.pageField]: this.currentPage,
         [config.sizeField]: config.pageSize,
-        ...config.requestParams,
-      };
-      if (config.queryKey && this.payload) {
-        query[config.queryKey] = this.payload;
+        ...config.requestParams
+      }
+      if (config.queryField && this.payload) {
+        query[config.queryField] = this.payload
       }
 
       try {
-        this.loading = true;
-        const resp = await config.method(query);
+        this.remoteLoading = true
+        const resp = await config.remoteMethod(query)
         this._updateOptionList(
           resp[config.respDataField],
           resp[config.respTotalField]
-        );
+        )
       } catch {
-        this._reset();
+        this._reset()
       } finally {
-        this.loading = false;
+        this.remoteLoading = false
       }
     },
 
     /**
      * 滚动加载更多数据
      */
-    handleLoadMore() {
-      if (!this.canLoadMore) return;
-      this.currentPage++;
-      this.fetchOptionListByScroll();
+    handleLoadMore () {
+      if (!this.canLoadMore) return
+      this.currentPage++
+      this.fetchOptionListByScroll()
     },
 
     /**
      * 选择下拉项时的操作
      */
-    handleChange(selected) {
+    handleChange (selected) {
       if (Array.isArray(selected)) {
         this.selectedOptions = selected.map(
-          (item) =>
-            this.selectedOptions.find((opt) => this.calcValue(opt) === item) ||
-            this.options.find((opt) => this.calcValue(opt) === item)
-        );
-        this.$emit("select", this.selectedOptions);
+          item => this.selectedOptions.find(opt => this.calcValue(opt) === item) ||
+            this.options.find(opt => this.calcValue(opt) === item)
+        )
+        this.$emit('select', this.selectedOptions)
       } else {
         this.$emit(
-          "select",
-          this.options.find((item) => selected === this.calcValue(item))
-        );
+          'select',
+          this.options.find(item => selected === this.calcValue(item))
+        )
       }
     },
 
@@ -480,21 +400,21 @@ export default {
      * -----------------------------------
      */
 
-    focus() {
-      this.$refs.select.focus();
+    focus () {
+      this.$refs.select.focus()
     },
-    blur() {
-      this.$refs.select.blur();
+    blur () {
+      this.$refs.select.blur()
     },
     // 清理tooltip Dom元素
-    cleanTooltip() {
-      const body = document.getElementsByTagName("body")[0];
-      const tooltips = document.getElementsByClassName("el-tooltip__popper");
-      const length = tooltips.length;
+    cleanTooltip () {
+      const body = document.getElementsByTagName('body')[0]
+      const tooltips = document.getElementsByClassName('el-tooltip__popper')
+      const length = tooltips.length
       for (let i = length - 1; i >= 0; i--) {
-        body.removeChild(tooltips[i]);
+        body.removeChild(tooltips[i])
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>

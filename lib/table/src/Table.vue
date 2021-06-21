@@ -1,5 +1,8 @@
 <template>
-  <div ref="aileTableRef" class="aile-table">
+  <div
+    ref="aileTableRef"
+    class="aile-table"
+  >
     <section
       class="aile-table__main"
       :style="{ padding: mergeConfig.tablePadding + 'px' }"
@@ -33,197 +36,193 @@
       :style="{ marginTop: mergeConfig.paginationMarginTop + 'px' }"
     >
       <el-pagination
+        ref="elPagination"
         v-bind="mergePaginationAttrs"
-        @current-change="onPaginationCurrentChange"
       >
-        <template>
-          <slot name="pagination" />
-        </template>
+        <slot name="pagination" />
       </el-pagination>
     </section>
   </div>
 </template>
 
 <script lang="tsx">
-import AileColumn from "./Column.vue";
-import debounce from "./debounce";
+import AileColumn from './Column.vue'
+import debounce from './debounce'
 
 import {
   DefaultConfig,
   DefaultPaginationAttrs,
-  DefaultTableAttrs,
-} from "./config.js";
+  DefaultTableAttrs
+} from './config.js'
 
-const PAGER_HEIGHT = 40;
+const PAGER_HEIGHT = 40
 
 export default {
-  name: "AileTable",
-
+  name: 'AileTable',
   components: { AileColumn },
+
+  inheritAttrs: false,
   props: {
     columns: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     data: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     // aile-table 配置项
     config: {
       type: Object,
-      default: () => ({}),
+      default: () => ({})
     },
     // el-table 属性
     table: {
       type: Object,
-      default: () => ({}),
+      default: () => ({})
     },
     // el-table-column 属性
     tableColumn: {
       type: Object,
-      default: () => ({}),
+      default: () => ({})
     },
     // el-pagination 属性
     pagination: {
       type: Object,
-      default: null,
-    },
-
-    tablePadding: {
-      type: Number,
-      default: undefined,
-    },
+      default: null
+    }
   },
-  data() {
+  data () {
     return {
       mergeLine: {},
       mergeIndex: {},
-      tableHeight: null,
-    };
+      tableHeight: null
+    }
   },
   computed: {
     // 配置项
-    mergeConfig() {
+    mergeConfig () {
       return {
         ...DefaultConfig,
         ...this.$aileTable.config,
-        ...this.config,
-      };
+        ...this.config
+      }
     },
 
     // el-table 属性
-    mergeTableAttrs() {
+    mergeTableAttrs () {
       return {
         ...DefaultTableAttrs, // 默认属性
         ...this.$aileTooltip.table, // 全局属性
+        ...this.$attrs,
         ...(this.table || {}), // 组件属性
-        [this.mergeConfig.heightMode]: this.tableHeight + 'px', // 计算表格高度
-      };
+        [this.mergeConfig.heightMode]: this.tableHeight + 'px' // 计算表格高度
+      }
     },
 
     // el-pagination 属性
-    mergePaginationAttrs() {
+    mergePaginationAttrs () {
       return {
         ...DefaultPaginationAttrs, // 默认属性
         ...this.$aileTooltip.pagination, // 全局属性
+        ...this.$attrs,
         ...(this.pagination || {}), // 组件属性
-      };
+        onCurrentChange: this.onPaginationCurrentChange
+      }
     },
 
-    dataLength() {
-      return this.data ? this.data.length : 0;
-    },
+    dataLength () {
+      return this.data ? this.data.length : 0
+    }
   },
   watch: {
-    "mergeConfig.merge"() {
-      this.getMergeArr(this.data, this.merge);
+    'mergeConfig.merge' () {
+      this.getMergeArr(this.data, this.merge)
     },
-    dataLength() {
-      this.getMergeArr(this.data, this.merge);
+    dataLength () {
+      this.getMergeArr(this.data, this.merge)
     },
-    pagination() {
-      this.resize(true);
-    },
+    pagination () {
+      this.resize(true)
+    }
   },
-  created() {
-    this.getMergeArr(this.data, this.merge);
+  created () {
+    this.getMergeArr(this.data, this.merge)
   },
-  mounted() {
-    this.resize(true);
-    window.addEventListener("resize", this.resize);
-    console.log(this.$refs)
+  mounted () {
+    this.resize(true)
+    window.addEventListener('resize', this.resize)
   },
-  beforeUnmount() {
-    window.removeEventListener("resize", this.resize);
+  beforeUnmount () {
+    window.removeEventListener('resize', this.resize)
   },
   methods: {
     /** 调整表格高度 */
-    resize(immediate) {
+    resize (immediate) {
       // 计算表格实际高度
       const _resizeHeight = () => {
-        const total = this.$refs.aileTableRef.clientHeight; // 容器总高度
+        const total = this.$refs.aileTableRef.clientHeight // 容器总高度
         const inside = this.mergeConfig.tablePadding * 2 // 表格上下padding之和
-        let result = total - inside;
+        let result = total - inside
         if (this.pagination) {
-          const pagination = 40 + this.mergeConfig.paginationMarginTop; // 分页器高度
-          result -= pagination;
+          const pagination = 40 + this.mergeConfig.paginationMarginTop // 分页器高度
+          result -= pagination
         }
-        this.tableHeight = result;
-      };
+        this.tableHeight = result
+      }
 
       // 立即执行
       if (immediate === true) {
-        _resizeHeight();
-        return;
+        _resizeHeight()
+        return
       }
 
       // 或者防抖执行
       debounce(() => {
-        _resizeHeight();
-      }, 700)();
+        _resizeHeight()
+      }, 700)()
     },
 
     /** 监听 <el-pagination /> 的 current-change 事件，因与 <el-table /> 存在相同事件，所以调整事件名称 */
-    onPaginationCurrentChange(currentPage) {
-      this.$refs.elTable.$el.scrollTop = 0;
-      this.$refs.elTable.setCurrentRow();
-      this.$emit("page-current-change", currentPage);
+    onPaginationCurrentChange (currentPage) {
+      this.$refs.elTable.$el.scrollTop = 0
+      this.$refs.elTable.setCurrentRow()
+      this.$emit('page-current-change', currentPage)
     },
 
     /** 以下方法为动态合并表格功能
      * ————————————————————————————————————————————————
      */
 
-    getMergeArr(tableData) {
-      if (!this.mergeConfig.merge) return;
-      this.mergeLine = {};
-      this.mergeIndex = {};
-      this.mergeConfig.merge.forEach((item) => {
+    getMergeArr (tableData) {
+      if (!this.mergeConfig.merge) return
+      this.mergeLine = {}
+      this.mergeIndex = {}
+      this.mergeConfig.merge.forEach(item => {
         tableData.forEach((data, i) => {
           if (i === 0) {
-            this.mergeIndex[item] = this.mergeIndex[item] || [];
-            this.mergeIndex[item].push(1);
-            this.mergeLine[item] = 0;
+            this.mergeIndex[item] = this.mergeIndex[item] || []
+            this.mergeIndex[item].push(1)
+            this.mergeLine[item] = 0
           } else if (data[item] === tableData[i - 1][item]) {
-            this.mergeIndex[item][this.mergeLine[item]] += 1;
-            this.mergeIndex[item].push(0);
+            this.mergeIndex[item][this.mergeLine[item]] += 1
+            this.mergeIndex[item].push(0)
           } else {
-            this.mergeIndex[item].push(1);
-            this.mergeLine[item] = i;
+            this.mergeIndex[item].push(1)
+            this.mergeLine[item] = i
           }
-        });
-      });
+        })
+      })
     },
-    mergeMethod({ column, rowIndex }) {
-      const index = this.merge.indexOf(column.property);
+    mergeMethod ({ column, rowIndex }) {
+      const index = this.mergeConfig.merge.indexOf(column.property)
       if (index > -1) {
-        const _row = this.mergeIndex[this.merge[index]][rowIndex];
-        const _col = _row > 0 ? 1 : 0;
+        const _row = this.mergeIndex[this.mergeConfig.merge[index]][rowIndex]
+        const _col = _row > 0 ? 1 : 0
         return {
           rowspan: _row,
-          colspan: _col,
-        };
+          colspan: _col
+        }
       }
     },
 
@@ -234,35 +233,35 @@ export default {
      * ________________________________________________
      */
 
-    clearSelection() {
-      return this.$refs.elTable.clearSelection();
+    clearSelection () {
+      return this.$refs.elTable.clearSelection()
     },
-    toggleRowSelection(row, selected) {
-      return this.$refs.elTable.toggleRowSelection(row, selected);
+    toggleRowSelection (row, selected) {
+      return this.$refs.elTable.toggleRowSelection(row, selected)
     },
-    toggleAllSelection() {
-      return this.$refs.elTable.toggleAllSelection();
+    toggleAllSelection () {
+      return this.$refs.elTable.toggleAllSelection()
     },
-    toggleRowExpansion(row, expanded) {
-      return this.$refs.elTable.toggleRowExpansion(row, expanded);
+    toggleRowExpansion (row, expanded) {
+      return this.$refs.elTable.toggleRowExpansion(row, expanded)
     },
-    setCurrentRow(row) {
-      return this.$refs.elTable.setCurrentRow(row);
+    setCurrentRow (row) {
+      return this.$refs.elTable.setCurrentRow(row)
     },
-    clearSort() {
-      return this.$refs.elTable.clearSort();
+    clearSort () {
+      return this.$refs.elTable.clearSort()
     },
-    clearFilter(columnKey) {
-      return this.$refs.elTable.clearFilter(columnKey);
+    clearFilter (columnKey) {
+      return this.$refs.elTable.clearFilter(columnKey)
     },
-    doLayout() {
-      return this.$refs.elTable.doLayout();
+    doLayout () {
+      return this.$refs.elTable.doLayout()
     },
-    sort(prop, order) {
-      return this.$refs.elTable.sort(prop, order);
-    },
-  },
-};
+    sort (prop, order) {
+      return this.$refs.elTable.sort(prop, order)
+    }
+  }
+}
 </script>
 
 <style scoped>

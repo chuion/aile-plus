@@ -1,7 +1,7 @@
 {
   "name": "aile-ui",
   "version": "1.1.0",
-  "description": "Advance Vue 2.x Components based on ElementPlus",
+  "description": "Advance Vue 3 Components based on ElementPlus",
   "main": "index.js",
   "scripts": {
     "lint": "eslint --ext .js,.vue ./ --fix"
@@ -18,13 +18,16 @@
   "author": "chuion",
   "license": "MIT",
   "devDependencies": {
+    "@vue/eslint-config-standard": "^6.0.0",
     "eslint": "^7.20.0",
     "eslint-config-chuion": "^1.0.0",
     "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-vue": "^7.5.0"
   },
   "peerDependencies": {
-    "element-ui": "^2.15.0",
-    "vue": "^2.6.12"
+    "element-plus": "^1.0.2-beta.48",
+    "vue": "^3.1.1"
   }
 }

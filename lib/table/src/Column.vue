@@ -29,15 +29,15 @@
 </template>
 
 <script lang="tsx">
-import AileRender from "./Render.jsx";
-import { DefaultTableColumnAttrs } from "./config.js";
+import AileRender from './Render.jsx'
+import { DefaultTableColumnAttrs } from './config.js'
 import { isEmpty } from '../../../utils/index.js'
 
 const cellForced = {
   selection: {
     renderHeader: ({ store }) => {
-      function isDisabled() {
-        return store.states.data.value && store.states.data.value.length === 0;
+      function isDisabled () {
+        return store.states.data.value && store.states.data.value.length === 0
       }
       return (
         <el-checkbox
@@ -49,10 +49,10 @@ const cellForced = {
           onUpdate:modelValue={store.toggleAllSelection}
           modelValue={store.states.isAllSelected.value}
         />
-      );
+      )
     },
     renderCell: ({ row, column, store, $index }) => {
-      if (!store) return;
+      if (!store) return
       return (
         <el-checkbox
           modelValue={store.isSelected(row)}
@@ -62,57 +62,57 @@ const cellForced = {
               : false
           }
           onChange={() => {
-            store.commit("rowSelectedChanged", row);
+            store.commit('rowSelectedChanged', row)
           }}
-          onClick={(event) => event.stopPropagation()}
+          onClick={event => event.stopPropagation()}
         />
-      );
+      )
     },
     sortable: false,
-    resizable: false,
+    resizable: false
   },
   index: {
-    renderHeader: ({ column }) => column.label || "#",
+    renderHeader: ({ column }) => column.label || '#',
     renderCell: function ({ column, $index }) {
-      let i = $index + 1;
-      const index = column.index;
+      let i = $index + 1
+      const index = column.index
 
-      if (typeof index === "number") {
-        i = $index + index;
-      } else if (typeof index === "function") {
-        i = index($index);
+      if (typeof index === 'number') {
+        i = $index + index
+      } else if (typeof index === 'function') {
+        i = index($index)
       }
-      return <div>{i}</div>;
+      return <div>{i}</div>
     },
     sortable: false,
-    resizable: false,
+    resizable: false
   },
   expand: {
-    renderHeader: ({ column }) => column.label || "",
+    renderHeader: ({ column }) => column.label || '',
     renderCell: ({ row, store }) => {
-      if (!store) return;
-      const classes = ["el-table__expand-icon"];
+      if (!store) return
+      const classes = ['el-table__expand-icon']
       if (store.states.expandRows.value.indexOf(row) > -1) {
-        classes.push("el-table__expand-icon--expanded");
+        classes.push('el-table__expand-icon--expanded')
       }
       const callback = function (e) {
-        e.stopPropagation();
-        store.toggleRowExpansion(row);
-      };
+        e.stopPropagation()
+        store.toggleRowExpansion(row)
+      }
       return (
         <div class={classes} onClick={callback}>
-          <i class="el-icon el-icon-arrow-right" />
+          <i class='el-icon el-icon-arrow-right' />
         </div>
-      );
+      )
     },
     sortable: false,
     resizable: false,
-    className: "el-table__expand-column",
-  },
-};
+    className: 'el-table__expand-column'
+  }
+}
 
 export default {
-  name: "AileColumn",
+  name: 'AileColumn',
 
   components: { AileRender },
   inheritAttrs: false,
@@ -120,108 +120,110 @@ export default {
     // <aile-table /> 配置项
     mergeConfig: {
       type: Object,
-      default: () => ({}),
+      default: () => ({})
     },
     // 当前列
     column: {
       type: Object,
-      default: () => ({}),
+      default: () => ({})
     },
     // <el-table-column /> 属性
     tableColumn: {
       type: Object,
-      default: () => ({}),
-    },
+      default: () => ({})
+    }
   },
   computed: {
     // 需要挂载到 <el-table-column /> 上的属性
-    mergeAttrs() {
+    mergeAttrs () {
       const res = {
         ...DefaultTableColumnAttrs, // 默认属性
-        ...this.$aileTable.column, // 全局属性
+        ...this.$aileTable.tableColumn, // 全局属性
         ...this.tableColumn, // 表格设置的列属性
-        ...this.column, // 列属性
+        ...this.column // 列属性
       };
-      ["render", "renderHeader", "formatter", "show"].forEach((key) => {
-        delete res[key];
-      });
-      return res;
-    },
+      ['render', 'renderHeader', 'formatter', 'show'].forEach(key => {
+        delete res[key]
+      })
+      return res
+    }
   },
   watch: {
     column: {
-      handler() {
-        this.generateRender();
+      handler () {
+        this.generateRender()
       },
-      immediate: true,
-    },
+      immediate: true
+    }
   },
   methods: {
     /** ElTable原生函数：获取当前cell对应的数据 */
-    getPropByPath(obj, path, strict) {
-      let tempObj = obj;
-      path = path.replace(/\[(\w+)\]/g, ".$1");
-      path = path.replace(/^\./, "");
+    getPropByPath (obj, path, strict) {
+      let tempObj = obj
+      path = path.replace(/\[(\w+)\]/g, '.$1')
+      path = path.replace(/^\./, '')
 
-      const keyArr = path.split(".");
-      let i = 0;
+      const keyArr = path.split('.')
+      let i = 0
       for (i; i < keyArr.length - 1; i++) {
-        if (!tempObj && !strict) break;
-        const key = keyArr[i];
+        if (!tempObj && !strict) break
+        const key = keyArr[i]
 
         if (key in tempObj) {
-          tempObj = tempObj[key];
+          tempObj = tempObj[key]
         } else {
           if (strict) {
-            throw new Error("please transfer a valid prop path to form item!");
+            throw new Error('please transfer a valid prop path to form item!')
           }
-          break;
+          break
         }
       }
       return {
         o: tempObj,
         k: keyArr[i],
-        v: (tempObj || {})[keyArr[i]],
-      };
+        v: (tempObj || {})[keyArr[i]]
+      }
     },
 
     /** 构建render函数 */
-    generateRender() {
+    generateRender () {
       // 存在特殊类型，采用预设的render
       if (this.column.type) {
-        this.column.renderHeader = cellForced[this.column.type].renderHeader;
-        this.column.render = this.column.render || cellForced[this.column.type].renderCell;
-        return;
+        this.column.renderHeader = cellForced[this.column.type].renderHeader
+        this.column.render = this.column.render || cellForced[this.column.type].renderCell
+        return
       }
 
       // 存在formatter，构建相应render函数
       if (this.column.formatter) {
-        this.column.render = (scope) => {
-          const { row, column, $index } = scope;
-          const property = column.property;
-          const cellValue = property && this.getPropByPath(row, property, false).v;
-          let value = this.column.formatter(row, column, cellValue, $index);
+        this.column.render = scope => {
+          const { row, column, $index } = scope
+          if (isEmpty(column)) return
+          const property = column.property
+          const cellValue = property && this.getPropByPath(row, property, false).v
+
+          let value = this.column.formatter(row, column, cellValue, $index)
           if (isEmpty(value)) {
-            value = this.mergeConfig.cellEmptyText;
+            value = this.mergeConfig.cellEmptyText
           }
-          return <span class="aile-table-cell__formatter">{value}</span>;
-        };
-        return;
+          return <span class='aile-table-cell__formatter'>{value}</span>
+        }
+        return
       }
 
       // 不存在render，构建包含默认文字的render函数
       if (!this.column.render) {
-        this.column.render = (scope) => {
-          let value = scope.row[scope.column.property];
+        this.column.render = scope => {
+          let value = scope.row[scope.column.property]
           if (isEmpty(value)) {
-            value = this.mergeConfig.cellEmptyText;
+            value = this.mergeConfig.cellEmptyText
           }
-          return <span>{value}</span>;
-        };
+          return <span>{value}</span>
+        }
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style>
