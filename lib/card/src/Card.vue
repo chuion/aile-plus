@@ -3,7 +3,7 @@
     :style="cardStyle"
     :class="cardClassList"
   >
-    <template v-if="calcTitle">
+    <template v-if="showHeader">
       <div
         :class="headerClassList"
         :style="headerStyleList"
@@ -35,18 +35,18 @@
 
     <div
       v-loading="loading"
-      :class="['aile-card__body', bodyClass]"
-      :style="bodyStyle"
+      :class="bodyClassList"
+      :style="bodyStyleList"
     >
-      <template v-if="loading || showEmpty">
-        <slot name="empty">
+      <template v-if="!loading && !isEmpty">
+        <slot :activeTitle="selectedTab" />
+      </template>
+      <template v-else>
+        <slot name="empty" v-if="isEmpty">
           <div class="empty-place">
             暂无数据
           </div>
         </slot>
-      </template>
-      <template v-else>
-        <slot :activeTitle="selectedTab" />
       </template>
     </div>
   </div>
@@ -75,8 +75,8 @@ export default {
       type: Boolean,
       default: false
     },
-    // showEmpty为true时，展示空白占位组件
-    showEmpty: {
+    // isEmpty为true时，展示空白占位组件
+    isEmpty: {
       type: Boolean,
       default: false
     },
@@ -118,6 +118,12 @@ export default {
         ...this.$attrs
       }
     },
+    showHeader () {
+      if (this.$slots.title || this.$slots.sub) {
+        return true;
+      }
+      return !isEmpty(this.title);
+    },
     calcTitle () {
       if (this.isSimpleTitle) {
         return this.title
@@ -150,7 +156,7 @@ export default {
     },
     headerClassList () {
       return mergeClass(
-        'aile-card__body',
+        'aile-card__header',
         this.mergeConfig.headerClass,
         this.headerClass
       )
@@ -165,7 +171,8 @@ export default {
       return mergeClass(
         'aile-card__body',
         this.mergeConfig.bodyClass,
-        this.bodyClass
+        this.bodyClass,
+        this.showHeader ? '' : 'is-hide-header'
       )
     },
     bodyStyleList () {
@@ -193,7 +200,13 @@ export default {
         Array.isArray(this.calcTitle) &&
         this.calcTitle.length
       ) {
-        this.setActiveTitle(this.calcTitle[0].value || this.calcTitle[0].label)
+        if (this.activeTitle) {
+          this.setActiveTitle(this.activeTitle);
+        } else {
+          this.setActiveTitle(
+            this.calcTitle[0].value || this.calcTitle[0].label
+          );
+        }
       }
     },
 
@@ -212,6 +225,7 @@ export default {
   position: relative;
   overflow: hidden;
   border-radius: 4px;
+  border: 1px solid #ebeef5;
 }
 
 .aile-card.is-always-shadow {
@@ -233,6 +247,7 @@ export default {
   box-sizing: border-box;
   background: #fff;
   border-radius: 4px 4px 0 0;
+  border-bottom: 1px solid #ebeef5;
 }
 
 .aile-card__header .title {
@@ -259,6 +274,10 @@ export default {
   user-select: none;
 }
 
+.aile-card__header .tabs :deep(.el-tabs__nav-wrap.is-top::after) {
+  height: 1px;
+}
+
 .aile-card__body {
   position: relative;
   width: 100%;
@@ -269,6 +288,10 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.aile-card__body.is-hide-header {
+  height: 100%;
 }
 
 .aile-card__body .empty-place {

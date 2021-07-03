@@ -41,26 +41,26 @@ yarn add aile-plus
 
 ### Attributes/Props 属性
 
-|    参数     |   数据类型   | 默认值 |                            说明                            |
-| :---------: | :----------: | :----: | :--------------------------------------------------------: |
-| **config**  |    Object    |   {}   |              [Config 配置项](#Config-配置项)               |
-|    title    | string/array |   -    |                        设置卡片标题                        |
-|  lazyLoad   |   boolean    | false  | 当 title 为数组时，lazyLoad 如果为 true，则不设置活跃标题  |
-|  showEmpty  |   boolean    | false  | showEmpty 为 true 时，显示`<slot name="empty"></slot>`内容 |
-|   loading   |   boolean    | false  |     loading 为 true 时，卡片正文部分 v-loading="true"      |
-| activeTitle |    string    |   -    |  当 title 为数组时，设置卡片活跃标题，值改变时会切换标题   |
+|    参数     |   数据类型   | 默认值 |                           说明                            |
+| :---------: | :----------: | :----: | :-------------------------------------------------------: |
+| **config**  |    Object    |   {}   |              [Config 配置项](#Config-配置项)              |
+|    title    | string/array |   -    |                       设置卡片标题                        |
+|  lazyLoad   |   boolean    | false  | 当 title 为数组时，lazyLoad 如果为 true，则不设置活跃标题 |
+|   isEmpty   |   boolean    | false  | isEmpty 为 true 时，显示`<slot name="empty"></slot>`内容  |
+|   loading   |   boolean    | false  |     loading 为 true 时，卡片正文部分 v-loading="true"     |
+| activeTitle |    string    |   -    |  当 title 为数组时，设置卡片活跃标题，值改变时会切换标题  |
 
 > Tips：Config配置项可通过 Prop 的方式直接传入 AileCard 组件，**优先级高于在config中配置**
 > 另外，`headerClass` `headerStyle` `bodyClass` `bodyStyle` 如果采用 Prop 的方式传入，会和 config 中的对应参数进行合并
 
 ### Slot 插槽
 
-| name  |                说明                 |
-| :---: | :---------------------------------: |
-|   —   |            卡片正文内容             |
-| title |           卡片左侧主标题            |
-|  sub  |           卡片右侧副标题            |
-| empty | 卡片 showEmpty 为 true 时展示的内容 |
+| name  |               说明                |
+| :---: | :-------------------------------: |
+|   —   |           卡片正文内容            |
+| title |          卡片左侧主标题           |
+|  sub  |          卡片右侧副标题           |
+| empty | 卡片 isEmpty 为 true 时展示的内容 |
 
 ### Events 事件
 
