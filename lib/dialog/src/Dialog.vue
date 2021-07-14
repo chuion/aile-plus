@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-bind="mergeAttrs"
+    v-bind="mergeDialogAttrs"
     :custom-class="calcCustomClass"
     @closed="handleClosed"
   >
@@ -23,7 +23,7 @@
             size="small"
             :loading="mergeConfig.confirmLoading"
             :disabled="mergeConfig.confirmDisabled"
-            @click="$emit('confirm')"
+            @click="handleConfirm"
           >
             {{ mergeConfig.confirmText }}
           </el-button>
@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { mergeClass } from '../../../utils'
+import { mergeAttrs, mergeClass } from '../../../utils'
 import { DefaultConfig, DefaultDialogAttrs } from './config'
 
 export default {
@@ -68,12 +68,8 @@ export default {
         ...this.config
       }
     },
-    mergeAttrs () {
-      return {
-        ...DefaultDialogAttrs,
-        ...this.$aileDialog.attrs,
-        ...this.$attrs
-      }
+    mergeDialogAttrs () {
+      return mergeAttrs(DefaultDialogAttrs, this.$aileDialog.attrs, this.$attrs)
     },
     calcCustomClass () {
       return mergeClass(
@@ -84,10 +80,12 @@ export default {
   },
   methods: {
     async handleCancel () {
-      if (this.$attrs.onCancel) {
-        await this.$emit('cancel')
+      if (this.mergeDialogAttrs.onCancel) {
+        await this.$emit('cancel', this.done);
+      } else if (this.mergeDialogAttrs.beforeClose) {
+        this.mergeDialogAttrs.beforeClose(this.done);
       } else {
-        this.$emit('update:modelValue', false)
+        this.done();
       }
     },
     handleClosed () {
@@ -95,6 +93,12 @@ export default {
       if (this.$attrs.onClosed) {
         this.$emit('closed')
       }
+    },
+    handleConfirm() {
+      this.$emit('confirm', this.done);
+    },
+    done() {
+      this.$emit('update:modelValue', false);
     }
   }
 }

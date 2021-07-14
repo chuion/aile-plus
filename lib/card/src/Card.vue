@@ -70,7 +70,7 @@ export default {
       default: ''
     },
     // 仅针对title为数组的情况
-    // 设置lazyLoad为true，则不进行标题初始化操作，外部可调用'$refs.Card.setActiveTitle(tab)'激活选项卡
+    // 设置lazyLoad为true，则不进行标题初始化操作，外部可通过更改activeTitle来渲染相应组件
     lazyLoad: {
       type: Boolean,
       default: false
@@ -226,6 +226,7 @@ export default {
   overflow: hidden;
   border-radius: 4px;
   border: 1px solid #ebeef5;
+  z-index: 1;
 }
 
 .aile-card.is-always-shadow {

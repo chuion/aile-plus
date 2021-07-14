@@ -10,20 +10,21 @@
       <span v-else>{{ slotProps.column.label }}</span>
     </template>
 
+    <template v-if="column.children">
+      <aile-column
+        v-for="(col, index) in column.children"
+        :key="index"
+        :column="col"
+        :table-column="tableColumn"
+      />
+    </template>
+
     <template #default="slotProps">
       <aile-render
         :scope="slotProps"
         :render="column.render"
         :cellEmptyText="mergeConfig.cellEmptyText"
       />
-      <template v-if="column.children">
-        <aile-column
-          v-for="(col, index) in column.children"
-          :key="index"
-          :column="col"
-          :table-column="tableColumn"
-        />
-      </template>
     </template>
   </el-table-column>
 </template>
@@ -88,7 +89,7 @@ const cellForced = {
     resizable: false
   },
   expand: {
-    renderHeader: ({ column }) => column.label || '',
+    renderHeader: ({ column }) => <span>{column.label || ''}</span>,
     renderCell: ({ row, store }) => {
       if (!store) return
       const classes = ['el-table__expand-icon']

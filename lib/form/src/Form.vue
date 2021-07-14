@@ -2,7 +2,6 @@
   <el-form
     ref="elForm"
     v-bind="mergeFormAttrs"
-    :model="model"
     :class="['aile-form', formClass]"
   >
     <template v-if="mergeConfig.layout">
@@ -47,6 +46,7 @@ import {
   DefaultFormItemAttrs,
 } from "./config";
 import { defineComponent } from "vue";
+import { isEmpty, mergeAttrs } from "../../../utils";
 
 export default defineComponent({
   name: "AileForm",
@@ -57,7 +57,6 @@ export default defineComponent({
     // 绑定表单值
     model: {
       type: Object,
-      required: true,
       default: () => ({}),
     },
 
@@ -95,20 +94,23 @@ export default defineComponent({
       };
     },
     mergeFormAttrs() {
-      return {
-        ...DefaultFormAttrs,
-        ...this.$aileForm.form,
-        ...this.$attrs,
-        ...this.form,
-      };
+      const res = mergeAttrs(
+        DefaultFormAttrs,
+        this.$aileForm.form,
+        this.$attrs,
+        this.form
+      );
+      if (!isEmpty(this.model)) {
+        res.model = this.model;
+      }
+      return res;
     },
     mergeFormItemAttrs() {
-      return {
-        ...DefaultFormItemAttrs,
-        ...this.$aileForm.formItem,
-        ...this.$attrs,
-        ...this.formItem,
-      };
+      return mergeAttrs(
+        DefaultFormItemAttrs,
+        this.$aileForm.formItem,
+        this.formItem
+      );
     },
     filteredColumns() {
       return this.columns.filter(
